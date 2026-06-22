@@ -1,0 +1,9 @@
+{
+  "name": "omnigent-docs",
+  "version": "1.0.0",
+  "description": "Omnigent documentation site",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "start:py": "python3 serve.py"
+  }
+}

@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omnigent Docs — Multi-Agent Platform for Vibe Coders</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #FF3621;
+      --red-hover: #E02D1A;
+      --red-light: rgba(255,54,33,0.1);
+      --dark: #1B1B1B;
+      --darker: #111111;
+      --sidebar-bg: #141414;
+      --light: #F5F5F5;
+      --white: #FFFFFF;
+      --border-dark: #2A2A2A;
+      --border-light: #E8E8E8;
+      --muted-dark: #888888;
+      --muted-light: #5A5A5A;
+      --sidebar-w: 258px;
+      --nav-h: 62px;
+      --code-bg: #1C2333;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--white);
+      color: var(--dark);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAVBAR ─────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: var(--dark);
+      border-bottom: 1px solid var(--border-dark);
+      display: flex; align-items: center;
+      padding: 0 20px; gap: 24px; z-index: 1000;
+    }
+    .logo { display: flex; align-items: center; gap: 9px; text-decoration: none; flex-shrink: 0; }
+    .logo-icon {
+      width: 31px; height: 31px;
+      background: linear-gradient(135deg, var(--red) 0%, #FF7A00 100%);
+      border-radius: 7px; display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 15px; color: #fff;
+    }
+    .logo-name { font-size: 17px; font-weight: 700; color: #fff; letter-spacing: -0.3px; }
+    .logo-pill {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+      color: var(--red); background: var(--red-light); border: 1px solid rgba(255,54,33,.28);
+      padding: 2px 7px; border-radius: 100px;
+    }
+    .nav-sep { width: 1px; height: 26px; background: var(--border-dark); flex-shrink: 0; }
+    .nav-links { display: flex; align-items: center; gap: 2px; }
+    .nav-link {
+      color: var(--muted-dark); text-decoration: none; font-size: 13.5px; font-weight: 500;
+      padding: 6px 11px; border-radius: 6px; transition: all .15s;
+    }
+    .nav-link:hover { color: #fff; background: rgba(255,255,255,.07); }
+    .nav-link.on { color: #fff; }
+    .nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+    .nav-search {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,.055); border: 1px solid var(--border-dark);
+      border-radius: 7px; padding: 5px 11px; color: var(--muted-dark);
+      font-size: 12.5px; width: 190px; cursor: pointer; transition: all .15s;
+    }
+    .nav-search:hover { background: rgba(255,255,255,.09); border-color: #3a3a3a; }
+    .kbd {
+      margin-left: auto; background: rgba(255,255,255,.09); border-radius: 3px;
+      padding: 1px 5px; font-size: 10.5px; font-family: monospace; color: #666;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 600;
+      text-decoration: none; cursor: pointer; border: none; transition: all .15s; font-family: inherit;
+    }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-primary:hover { background: var(--red-hover); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(255,54,33,.35); }
+    .btn-ghost { background: transparent; color: #fff; border: 1px solid var(--border-dark); }
+    .btn-ghost:hover { border-color: #555; background: rgba(255,255,255,.06); }
+    .btn-lg { padding: 11px 26px; font-size: 15px; border-radius: 9px; }
+    .hamburger {
+      display: none; background: none; border: none; cursor: pointer;
+      padding: 5px; color: #fff; border-radius: 5px; transition: background .15s;
+    }
+    .hamburger:hover { background: rgba(255,255,255,.1); }
+
+    /* ── LAYOUT ─────────────────────────────────────── */
+    .wrap { display: flex; margin-top: var(--nav-h); }
+
+    /* ── SIDEBAR ─────────────────────────────────────── */
+    .sidebar {
+      position: fixed; top: var(--nav-h); left: 0;
+      width: var(--sidebar-w); height: calc(100vh - var(--nav-h));
+      background: var(--sidebar-bg); border-right: 1px solid var(--border-dark);
+      overflow-y: auto; padding: 20px 0; z-index: 100; transition: transform .25s ease;
+    }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+    .sb-group { margin-bottom: 4px; }
+    .sb-head {
+      font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.1px; color: #555; padding: 8px 18px 5px;
+    }
+    .sb-link {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 18px; color: #777; text-decoration: none;
+      font-size: 13px; border-left: 2px solid transparent; transition: all .15s; cursor: pointer;
+    }
+    .sb-link:hover { color: #fff; background: rgba(255,255,255,.05); border-left-color: rgba(255,54,33,.4); }
+    .sb-link.on { color: #fff; background: rgba(255,54,33,.1); border-left-color: var(--red); font-weight: 500; }
+    .sb-divider { height: 1px; background: var(--border-dark); margin: 10px 18px; }
+    .sb-card {
+      margin: 16px 14px 0;
+      background: linear-gradient(135deg, rgba(255,54,33,.13), rgba(255,122,0,.08));
+      border: 1px solid rgba(255,54,33,.2); border-radius: 9px; padding: 14px;
+    }
+    .sb-card-tag { font-size: 11px; font-weight: 700; color: #FF6B55; margin-bottom: 5px; }
+    .sb-card-desc { font-size: 11.5px; color: #555; line-height: 1.55; }
+    .sb-card-link { font-size: 11px; color: var(--red); font-weight: 600; text-decoration: none; display: block; margin-top: 8px; }
+    .sb-card-link:hover { text-decoration: underline; }
+
+    /* ── MAIN ─────────────────────────────────────── */
+    .main { margin-left: var(--sidebar-w); flex: 1; min-height: calc(100vh - var(--nav-h)); }
+
+    /* ── SECTION BASE ─────────────────────────────── */
+    .section { padding: 72px 60px; border-bottom: 1px solid var(--border-light); }
+    .section-alt { background: var(--light); }
+    .section-dark { background: var(--dark); color: #fff; }
+    .s-eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.4px; color: var(--red); margin-bottom: 13px;
+    }
+    .s-eyebrow::before { content: ''; display: block; width: 14px; height: 2px; background: var(--red); border-radius: 1px; }
+    .s-title { font-size: clamp(26px, 3vw, 38px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin-bottom: 14px; }
+    .s-title.inv { color: #fff; }
+    .s-desc { font-size: 15.5px; color: var(--muted-light); max-width: 580px; line-height: 1.7; margin-bottom: 48px; }
+    .s-desc.inv { color: #888; }
+
+    /* ── HERO ─────────────────────────────────────── */
+    #hero {
+      background: var(--dark); padding: 92px 60px 76px;
+      position: relative; overflow: hidden; border-bottom: none;
+    }
+    #hero::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 90% 55% at 50% -10%, rgba(255,54,33,.22) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 35% at 90% 60%, rgba(255,122,0,.1) 0%, transparent 55%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 38px 38px;
+    }
+    .hero-inner { position: relative; z-index: 1; max-width: 780px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(255,54,33,.1); border: 1px solid rgba(255,54,33,.28);
+      color: #FF7055; font-size: 12px; font-weight: 600;
+      padding: 5px 13px; border-radius: 100px; margin-bottom: 26px; letter-spacing: 0.2px;
+    }
+    .pulse { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
+    .hero-h1 {
+      font-size: clamp(38px, 5.5vw, 62px); font-weight: 900;
+      line-height: 1.06; letter-spacing: -2.5px; color: #fff; margin-bottom: 22px;
+    }
+    .grad-text {
+      background: linear-gradient(135deg, var(--red) 0%, #FF8C00 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub { font-size: 17.5px; color: #888; line-height: 1.68; margin-bottom: 36px; max-width: 560px; }
+    .hero-sub strong { color: #bbb; font-weight: 500; }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-stats { display: flex; gap: 44px; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--border-dark); flex-wrap: wrap; }
+    .stat-val { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+    .stat-val em { color: var(--red); font-style: normal; }
+    .stat-lbl { font-size: 12.5px; color: #555; }
+
+    /* ── PROBLEM ─────────────────────────────────── */
+    .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: start; }
+    .pain-list { list-style: none; display: flex; flex-direction: column; gap: 18px; margin-top: 28px; }
+    .pain-item { display: flex; gap: 14px; align-items: flex-start; }
+    .pain-icon {
+      width: 36px; height: 36px; background: #FFF0EE; border: 1px solid #FFD5CE;
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0; margin-top: 1px;
+    }
+    .pain-title { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+    .pain-body { font-size: 13px; color: var(--muted-light); line-height: 1.55; }
+
+    /* Chat mockup */
+    .chat-box {
+      background: #1A2030; border-radius: 12px; overflow: hidden;
+      border: 1px solid #2A3448; box-shadow: 0 24px 64px rgba(0,0,0,.22), 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .chat-bar {
+      background: #141921; padding: 11px 15px;
+      display: flex; align-items: center; gap: 9px; border-bottom: 1px solid #2A3448;
+    }
+    .dots { display: flex; gap: 5px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .d-r { background: #FF5F57; } .d-y { background: #FFBD2E; } .d-g { background: #28CA41; }
+    .chat-title { font-size: 11.5px; color: #4A5870; font-family: monospace; }
+    .chat-body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .msg { display: flex; flex-direction: column; gap: 3px; }
+    .msg-role { font-size: 9.5px; font-weight: 700; letter-spacing: 1.1px; text-transform: uppercase; font-family: monospace; }
+    .msg-role.u { color: #61AFEF; } .msg-role.a { color: #98C379; } .msg-role.e { color: #E06C75; }
+    .msg-text {
+      font-size: 12px; color: #ABB2BF; line-height: 1.6; font-family: monospace;
+      padding: 9px 13px; border-radius: 7px;
+      background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.05);
+    }
+    .msg-text.bad { color: #E06C75; background: rgba(224,108,117,.07); border-color: rgba(224,108,117,.18); }
+    .error-bar {
+      background: rgba(224,108,117,.1); border: 1px solid rgba(224,108,117,.28);
+      border-radius: 7px; padding: 9px 13px; color: #E06C75;
+      font-size: 11.5px; font-family: monospace; display: flex; align-items: center; gap: 7px;
+    }
+    .chat-cap { font-size: 11px; color: #555; text-align: center; margin-top: 9px; }
+
+    /* ── WHAT IS OMNIGENT ─────────────────────────── */
+    .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .step-list { display: flex; flex-direction: column; gap: 18px; }
+    .step-row { display: flex; gap: 13px; align-items: flex-start; }
+    .step-num {
+      width: 28px; height: 28px; flex-shrink: 0; margin-top: 1px;
+      background: linear-gradient(135deg, var(--red), #FF7A00);
+      border-radius: 7px; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: #fff;
+    }
+    .step-text h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .step-text p { font-size: 13px; color: var(--muted-light); line-height: 1.55; }
+    .callout {
+      display: flex; gap: 13px; align-items: flex-start;
+      background: rgba(255,54,33,.055); border: 1px solid rgba(255,54,33,.14);
+      border-radius: 10px; padding: 18px 20px; margin-top: 28px;
+    }
+    .callout-ico { font-size: 19px; flex-shrink: 0; margin-top: 1px; }
+    .callout h4 { font-size: 13.5px; font-weight: 700; color: var(--red); margin-bottom: 5px; }
+    .callout p { font-size: 13px; color: var(--muted-light); line-height: 1.55; }
+
+    /* Agent tree visual */
+    .agent-visual {
+      background: #1A2030; border-radius: 14px; padding: 28px 24px;
+      border: 1px solid #2A3448;
+    }
+    .av-head { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #4A5870; text-align: center; margin-bottom: 22px; }
+    .tree { display: flex; flex-direction: column; align-items: center; }
+    .node {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: 9px; font-size: 12.5px; font-weight: 600; color: #fff;
+    }
+    .node-root { background: linear-gradient(135deg, var(--red), #FF7A00); padding: 12px 26px; font-size: 13.5px; box-shadow: 0 0 28px rgba(255,54,33,.35); }
+    .node-child { background: #232D42; border: 1px solid #334; font-size: 12px; }
+    .vline { width: 2px; height: 22px; background: linear-gradient(to bottom, rgba(255,54,33,.35), rgba(255,54,33,.08)); }
+    .hrow { display: flex; gap: 12px; justify-content: center; }
+    .hcol { display: flex; flex-direction: column; align-items: center; }
+    .dot-live { width: 6px; height: 6px; border-radius: 50%; background: #4CAF50; animation: blink 2s infinite; }
+    .dot-busy { width: 6px; height: 6px; border-radius: 50%; background: #FF9800; animation: blink 1.2s infinite; }
+    .av-stats { display: flex; justify-content: space-between; margin-top: 24px; padding-top: 18px; border-top: 1px solid #2A3448; }
+    .av-stat-val { font-size: 20px; font-weight: 800; color: #fff; }
+    .av-stat-lbl { font-size: 10.5px; color: #4A5870; margin-top: 2px; }
+
+    /* ── FEATURES ─────────────────────────────────── */
+    .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .feat-card {
+      background: #fff; border: 1px solid var(--border-light);
+      border-radius: 12px; padding: 24px; transition: all .2s; position: relative; overflow: hidden;
+    }
+    .feat-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--red), #FF7A00);
+      transform: scaleX(0); transform-origin: left; transition: transform .22s;
+    }
+    .feat-card:hover { border-color: rgba(255,54,33,.22); box-shadow: 0 8px 28px rgba(0,0,0,.07); transform: translateY(-2px); }
+    .feat-card:hover::after { transform: scaleX(1); }
+    .feat-ico {
+      width: 42px; height: 42px; background: var(--red-light); border: 1px solid rgba(255,54,33,.18);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 19px; margin-bottom: 15px;
+    }
+    .feat-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .feat-desc { font-size: 13px; color: var(--muted-light); line-height: 1.6; }
+
+    /* ── TUTORIAL ─────────────────────────────────── */
+    .tut-shell {
+      display: grid; grid-template-columns: 240px 1fr;
+      border: 1px solid var(--border-light); border-radius: 14px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.05);
+    }
+    .tut-nav { background: var(--dark); padding: 20px 0; }
+    .tut-nav-head { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #444; padding: 0 18px 14px; border-bottom: 1px solid var(--border-dark); margin-bottom: 10px; }
+    .tut-item {
+      display: flex; align-items: center; gap: 11px;
+      padding: 9px 18px; cursor: pointer; color: #666; font-size: 12.5px; transition: all .15s;
+    }
+    .tut-item:hover { background: rgba(255,255,255,.04); color: #fff; }
+    .tut-item.on { background: rgba(255,54,33,.1); color: #fff; border-left: 2px solid var(--red); }
+    .tut-item.done .tut-num { background: #1B3D24; color: #4CAF50; }
+    .tut-num {
+      width: 21px; height: 21px; background: #252525; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10.5px; font-weight: 700; flex-shrink: 0;
+    }
+    .tut-item.on .tut-num { background: var(--red); color: #fff; }
+    .tut-body { padding: 40px 44px; background: #fff; }
+    .tut-step { display: none; animation: fadeUp .22s ease; }
+    .tut-step.on { display: block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
+    .step-hd { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .step-badge { background: var(--red); color: #fff; font-size: 10.5px; font-weight: 800; padding: 2px 10px; border-radius: 100px; letter-spacing: 0.5px; }
+    .step-title { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
+    .step-desc { font-size: 14.5px; color: var(--muted-light); line-height: 1.7; margin-bottom: 20px; }
+    .step-note {
+      background: rgba(255,54,33,.055); border-left: 3px solid var(--red);
+      padding: 13px 17px; border-radius: 0 8px 8px 0;
+      font-size: 13px; color: var(--muted-light); line-height: 1.6; margin-top: 14px;
+    }
+    .step-note strong { color: var(--red); }
+    .step-btns { display: flex; gap: 10px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--border-light); }
+    .btn-back { background: transparent; color: var(--dark); border: 1px solid #ddd; }
+    .btn-back:hover { border-color: #aaa; background: var(--light); }
+
+    /* Code blocks */
+    .code-wrap { position: relative; margin: 14px 0; border-radius: 9px; overflow: hidden; border: 1px solid #2A3448; }
+    .code-head {
+      background: #141921; padding: 9px 15px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid #2A3448;
+    }
+    .code-lang { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #4A5870; }
+    .copy-btn {
+      background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.09);
+      color: #888; font-size: 10.5px; font-weight: 500; padding: 3px 9px;
+      border-radius: 4px; cursor: pointer; transition: all .15s; font-family: inherit;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+    .code-wrap pre { margin: 0; }
+    .code-wrap code.hljs { font-size: 13px !important; line-height: 1.65 !important; padding: 18px !important; background: #1C2333 !important; font-family: 'SF Mono','Monaco','Fira Code',monospace !important; }
+
+    /* inline code */
+    .ic { font-family: 'SF Mono','Monaco',monospace; font-size: .875em; background: rgba(255,54,33,.07); color: var(--red); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(255,54,33,.14); }
+
+    /* ── TESTIMONIALS ─────────────────────────────── */
+    .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+    .testi-card {
+      background: #fff; border: 1px solid var(--border-light);
+      border-radius: 14px; padding: 26px; transition: all .2s;
+    }
+    .testi-card:hover { box-shadow: 0 12px 38px rgba(0,0,0,.07); transform: translateY(-2px); border-color: rgba(255,54,33,.18); }
+    .stars { color: #FF9800; font-size: 15px; letter-spacing: 1px; margin-bottom: 15px; }
+    .testi-q {
+      font-size: 14px; color: var(--dark); line-height: 1.72; margin-bottom: 18px; font-style: italic;
+    }
+    .testi-q::before { content: '\201C'; font-size: 42px; color: var(--red); opacity: .25; line-height: 0; vertical-align: -15px; margin-right: 3px; }
+    .testi-author { display: flex; align-items: center; gap: 11px; padding-top: 15px; border-top: 1px solid var(--border-light); }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .author-name { font-size: 13.5px; font-weight: 700; }
+    .author-role { font-size: 11.5px; color: var(--muted-light); }
+
+    /* ── CTA BANNER ───────────────────────────────── */
+    #cta { text-align: center; padding: 88px 60px; }
+    #cta .hero-badge { justify-content: center; margin: 0 auto 22px; }
+    #cta .s-title { font-size: clamp(26px, 3.5vw, 44px); max-width: 540px; margin: 0 auto 14px; }
+    #cta .s-desc { margin: 0 auto 34px; }
+    #cta .hero-actions { justify-content: center; }
+
+    /* ── FOOTER ───────────────────────────────────── */
+    footer {
+      background: var(--dark); border-top: 1px solid var(--border-dark);
+      padding: 58px 60px 38px;
+    }
+    .ft-grid { display: grid; grid-template-columns: 270px repeat(3, 1fr); gap: 44px; margin-bottom: 44px; }
+    .ft-logo { display: flex; align-items: center; gap: 9px; margin-bottom: 13px; }
+    .ft-desc { font-size: 13px; color: #4A4A4A; line-height: 1.65; margin-bottom: 18px; }
+    .ft-social { display: flex; gap: 7px; }
+    .soc-btn {
+      width: 30px; height: 30px; background: rgba(255,255,255,.05);
+      border: 1px solid var(--border-dark); border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: #555; text-decoration: none; font-size: 13px; transition: all .15s;
+    }
+    .soc-btn:hover { background: rgba(255,255,255,.1); color: #fff; border-color: #444; }
+    .ft-col-h { font-size: 12.5px; font-weight: 700; color: #fff; margin-bottom: 14px; }
+    .ft-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .ft-link { font-size: 13px; color: #4A4A4A; text-decoration: none; transition: color .15s; }
+    .ft-link:hover { color: #bbb; }
+    .ft-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 28px; border-top: 1px solid var(--border-dark); }
+    .ft-copy { font-size: 12.5px; color: #444; }
+    .ft-legal { display: flex; gap: 18px; }
+
+    /* ── OVERLAY ─────────────────────────────────── */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.52); z-index: 99; }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 1100px) {
+      .feat-grid { grid-template-columns: repeat(2,1fr); }
+      .overview-grid { grid-template-columns: 1fr; }
+      .problem-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 780px) {
+      .sidebar { transform: translateX(-100%); z-index: 200; }
+      .sidebar.open { transform: translateX(0); }
+      .overlay.open { display: block; }
+      .main { margin-left: 0; }
+      .hamburger { display: flex; }
+      .nav-links, .nav-search { display: none; }
+      .section, #hero { padding: 52px 22px; }
+      #cta { padding: 64px 22px; }
+      .feat-grid { grid-template-columns: 1fr; }
+      .tut-shell { grid-template-columns: 1fr; }
+      .tut-nav { display: none; }
+      .tut-body { padding: 24px 20px; }
+      .testi-grid { grid-template-columns: 1fr; }
+      footer { padding: 44px 22px 30px; }
+      .ft-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .ft-brand { grid-column: 1 / -1; }
+      .ft-bottom { flex-direction: column; gap: 14px; text-align: center; }
+      .hero-stats { gap: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════ NAVBAR ════════════════ -->
+<nav class="navbar">
+  <a class="logo" href="#hero">
+    <div class="logo-icon">Ω</div>
+    <span class="logo-name">Omnigent</span>
+    <span class="logo-pill">Docs</span>
+  </a>
+  <div class="nav-sep"></div>
+  <div class="nav-links">
+    <a href="#hero"        class="nav-link on">Home</a>
+    <a href="#what-is"     class="nav-link">Overview</a>
+    <a href="#features"    class="nav-link">Features</a>
+    <a href="#tutorial"    class="nav-link">Tutorial</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-search">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      Search docs...
+      <span class="kbd">⌘K</span>
+    </div>
+    <a href="https://github.com" class="btn btn-ghost" style="padding:6px 13px;font-size:13px;">GitHub</a>
+    <a href="#tutorial" class="btn btn-primary" style="padding:6px 13px;font-size:13px;">Get Started</a>
+  </div>
+  <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+</nav>
+
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="wrap">
+
+  <!-- ════════════════ SIDEBAR ════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-group">
+      <div class="sb-head">Getting Started</div>
+      <a href="#hero"       class="sb-link on"  onclick="sbActive(this)">🏠 Introduction</a>
+      <a href="#problem"    class="sb-link"      onclick="sbActive(this)">⚠️ The Problem</a>
+      <a href="#what-is"    class="sb-link"      onclick="sbActive(this)">🔮 What is Omnigent</a>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-group">
+      <div class="sb-head">Core Concepts</div>
+      <a href="#features"      class="sb-link" onclick="sbActive(this)">⚡ Features</a>
+      <a href="#tutorial"      class="sb-link" onclick="sbActive(this)">📖 Tutorial</a>
+      <a href="#testimonials"  class="sb-link" onclick="sbActive(this)">💬 Community</a>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-group">
+      <div class="sb-head">Reference</div>
+      <a href="#" class="sb-link">🔧 CLI Reference</a>
+      <a href="#" class="sb-link">🌐 REST API</a>
+      <a href="#" class="sb-link">🤖 Agent Configs</a>
+      <a href="#" class="sb-link">🔗 Integrations</a>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-group">
+      <div class="sb-head">Community</div>
+      <a href="#" class="sb-link">💻 GitHub</a>
+      <a href="#" class="sb-link">💬 Discord</a>
+      <a href="#" class="sb-link">🐦 Twitter / X</a>
+    </div>
+    <div class="sb-card">
+      <div class="sb-card-tag">✨ v1.4 Released</div>
+      <div class="sb-card-desc">Parallel agent execution, session trees &amp; token-aware routing now available.</div>
+      <a href="#" class="sb-card-link">See what's new →</a>
+    </div>
+  </aside>
+
+  <!-- ════════════════ MAIN ════════════════ -->
+  <main class="main">
+
+    <!-- ── HERO ── -->
+    <section class="section" id="hero" style="padding:92px 60px 76px;background:var(--dark);border-bottom:none;">
+      <div class="hero-grid"></div>
+      <div class="hero-inner">
+        <div class="hero-badge"><span class="pulse"></span> Now in Public Beta — v1.4.0</div>
+        <h1 class="hero-h1">
+          Stop Losing Your<br>Flow to <span class="grad-text">Token Limits.</span>
+        </h1>
+        <p class="hero-sub">
+          <strong>Omnigent</strong> is the multi-agent orchestration platform built for vibe coders.
+          Keep sessions alive forever, spawn specialized subagents, and maintain full project context —
+          no matter how deep the rabbit hole goes.
+        </p>
+        <div class="hero-actions">
+          <a href="#tutorial" class="btn btn-primary btn-lg">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Get Started Free
+          </a>
+          <a href="#what-is" class="btn btn-ghost btn-lg">Read the Docs</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-val">∞</div>
+            <div class="stat-lbl">Effective context window</div>
+          </div>
+          <div>
+            <div class="stat-val">6<em>+</em></div>
+            <div class="stat-lbl">AI providers supported</div>
+          </div>
+          <div>
+            <div class="stat-val">10<em>×</em></div>
+            <div class="stat-lbl">Faster than re-prompting</div>
+          </div>
+          <div>
+            <div class="stat-val">0</div>
+            <div class="stat-lbl">Context resets needed</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── THE PROBLEM ── -->
+    <section class="section" id="problem">
+      <div class="s-eyebrow">The Problem</div>
+      <div class="problem-grid">
+        <div>
+          <h2 class="s-title">You're in the zone.<br>Then the AI forgets everything.</h2>
+          <p style="font-size:15px;color:var(--muted-light);line-height:1.7;margin-bottom:4px;">Every vibe coder knows the feeling. You're three hours deep, the AI finally understands your architecture, your conventions, your entire vision — and then it hits: the token limit.</p>
+          <ul class="pain-list">
+            <li class="pain-item">
+              <div class="pain-icon">💥</div>
+              <div>
+                <div class="pain-title">Context Window Fills Up</div>
+                <div class="pain-body">The AI loses everything it knew. File structures, design decisions, variable names — gone in an instant.</div>
+              </div>
+            </li>
+            <li class="pain-item">
+              <div class="pain-icon">🔄</div>
+              <div>
+                <div class="pain-title">You Re-Explain from Scratch</div>
+                <div class="pain-body">30 minutes of copy-pasting context, writing summaries, re-onboarding the AI to your own codebase.</div>
+              </div>
+            </li>
+            <li class="pain-item">
+              <div class="pain-icon">🧠</div>
+              <div>
+                <div class="pain-title">Flow State is Destroyed</div>
+                <div class="pain-body">Deep work doesn't survive interruption. Context switching kills momentum and your best ideas die in the reset.</div>
+              </div>
+            </li>
+            <li class="pain-item">
+              <div class="pain-icon">📉</div>
+              <div>
+                <div class="pain-title">Quality Regresses</div>
+                <div class="pain-body">A fresh AI session makes dumb mistakes — inconsistent naming, forgotten patterns, code that contradicts earlier decisions.</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <div class="chat-box">
+            <div class="chat-bar">
+              <div class="dots"><div class="dot d-r"></div><div class="dot d-y"></div><div class="dot d-g"></div></div>
+              <span class="chat-title">claude — my-app session</span>
+            </div>
+            <div class="chat-body">
+              <div class="msg">
+                <div class="msg-role u">YOU</div>
+                <div class="msg-text">Now add the useUserStore hook to ProfileCard — same pattern we used for DashboardHeader.</div>
+              </div>
+              <div class="msg">
+                <div class="msg-role a">CLAUDE</div>
+                <div class="msg-text">On it. I'll use the shallow selector from /store/selectors.ts like we agreed. Should I also wire up the optimistic update for the avatar change?</div>
+              </div>
+              <div class="msg">
+                <div class="msg-role u">YOU</div>
+                <div class="msg-text">Yes! And remember — use the design tokens from src/tokens.ts, not hardcoded values.</div>
+              </div>
+              <div class="error-bar">⚠ Context window limit reached. Starting new conversation…</div>
+              <div class="msg">
+                <div class="msg-role e">CLAUDE</div>
+                <div class="msg-text bad">Hello! I'd be happy to help with React. Could you share the component you're working on and give me some background on your project structure? I'll need context before I can assist.</div>
+              </div>
+              <div class="msg">
+                <div class="msg-role u">YOU</div>
+                <div class="msg-text" style="color:#E06C75;">...you've got to be kidding me.</div>
+              </div>
+            </div>
+          </div>
+          <p class="chat-cap">The AI that knew your entire project — gone in an instant.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WHAT IS OMNIGENT ── -->
+    <section class="section section-alt" id="what-is">
+      <div class="s-eyebrow">Solution</div>
+      <div class="overview-grid">
+        <div>
+          <h2 class="s-title">Meet Omnigent — Your Persistent AI Dev Team</h2>
+          <p style="font-size:15px;color:var(--muted-light);line-height:1.7;margin-bottom:28px;">
+            Omnigent is a multi-agent orchestration platform that keeps your AI sessions alive indefinitely. Instead of one overwhelmed AI trying to hold everything, you get a <strong>team of specialized agents</strong> — each focused, each within limits, each reporting to an orchestrator that remembers everything.
+          </p>
+          <div class="step-list">
+            <div class="step-row">
+              <div class="step-num">1</div>
+              <div class="step-text">
+                <h4>Sessions That Never Die</h4>
+                <p>Session state is persisted to disk. Close your terminal, reboot, take a break — pick up exactly where you left off.</p>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-num">2</div>
+              <div class="step-text">
+                <h4>Specialized Subagents</h4>
+                <p>Spawn dedicated agents for Frontend, Backend, DB, DevOps — each expert in their domain with scoped context.</p>
+              </div>
+            </div>
+            <div class="step-row">
+              <div class="step-num">3</div>
+              <div class="step-text">
+                <h4>Token-Aware Routing</h4>
+                <p>The orchestrator monitors token usage in real-time and delegates tasks to fresh agents before any limit is reached.</p>
+              </div>
+            </div>
+          </div>
+          <div class="callout">
+            <div class="callout-ico">💡</div>
+            <div>
+              <h4>Think Kubernetes for AI agents</h4>
+              <p>Omnigent schedules, monitors, and orchestrates your AI workforce — so you can focus on building, not managing context windows.</p>
+            </div>
+          </div>
+        </div>
+        <div class="agent-visual">
+          <div class="av-head">Live Session Tree</div>
+          <div class="tree">
+            <div class="node node-root">🧠 Omnigent Orchestrator</div>
+            <div class="vline"></div>
+            <div class="hrow">
+              <div class="hcol">
+                <div class="node node-child"><div class="dot-live"></div>⚛️ Frontend</div>
+              </div>
+              <div style="width:48px"></div>
+              <div class="hcol">
+                <div class="node node-child"><div class="dot-busy"></div>⚙️ Backend</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:52px;justify-content:center">
+              <div class="vline"></div>
+              <div class="vline"></div>
+            </div>
+            <div class="hrow" style="gap:9px;">
+              <div class="node node-child" style="font-size:11px;padding:7px 12px;"><div class="dot-live"></div>🗄️ DB Agent</div>
+              <div class="node node-child" style="font-size:11px;padding:7px 12px;"><div class="dot-live"></div>🚀 DevOps</div>
+              <div class="node node-child" style="font-size:11px;padding:7px 12px;"><div class="dot-busy"></div>🔍 QA</div>
+            </div>
+          </div>
+          <div class="av-stats">
+            <div style="text-align:center">
+              <div class="av-stat-val">5</div>
+              <div class="av-stat-lbl">Active Agents</div>
+            </div>
+            <div style="text-align:center">
+              <div class="av-stat-val" style="color:#4CAF50">73%</div>
+              <div class="av-stat-lbl">Token Headroom</div>
+            </div>
+            <div style="text-align:center">
+              <div class="av-stat-val" style="color:var(--red)">0</div>
+              <div class="av-stat-lbl">Context Resets</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FEATURES ── -->
+    <section class="section" id="features">
+      <div class="s-eyebrow">Features</div>
+      <h2 class="s-title">Everything a vibe coder needs</h2>
+      <p class="s-desc">Six core capabilities that eliminate the token-limit problem and supercharge your AI-assisted development workflow.</p>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-ico">🔒</div>
+          <div class="feat-title">Persistent Sessions</div>
+          <div class="feat-desc">Sessions are serialized to disk. Your conversation history, file context, and agent memory survive reboots, network drops, and terminal crashes.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">👥</div>
+          <div class="feat-title">Multi-Agent Team</div>
+          <div class="feat-desc">Spawn specialized subagents per domain — Frontend, Backend, Database, DevOps, QA. Each holds deep expertise in its lane without polluting others' context.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">⚡</div>
+          <div class="feat-title">Parallel Execution</div>
+          <div class="feat-desc">Run multiple agents simultaneously. While your Frontend agent writes components, your Backend agent scaffolds APIs — real parallel development, no waiting.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">🧭</div>
+          <div class="feat-title">Token-Aware Routing</div>
+          <div class="feat-desc">The orchestrator monitors every agent's token usage in real-time. Tasks are delegated before any agent approaches its limit — zero context resets, guaranteed.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">🌳</div>
+          <div class="feat-title">Session Tree UI</div>
+          <div class="feat-desc">A visual hierarchy of all your agents, their active tasks, token headroom, and outputs. Full visibility into your AI workforce from one clean browser interface.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico">🔌</div>
+          <div class="feat-title">Works with Claude, Codex &amp; Cursor</div>
+          <div class="feat-desc">Native support for Claude (Anthropic), OpenAI Codex, Cursor, GitHub Copilot, and any OpenAI-compatible API. Mix models — Claude for reasoning, Haiku for speed.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TUTORIAL ── -->
+    <section class="section section-alt" id="tutorial">
+      <div class="s-eyebrow">Tutorial</div>
+      <h2 class="s-title">Get up and running in 5 minutes</h2>
+      <p class="s-desc">Follow these steps to launch your first Omnigent session and spawn your first multi-agent team.</p>
+
+      <div class="tut-shell">
+        <!-- tutorial sidebar nav -->
+        <div class="tut-nav">
+          <div class="tut-nav-head">Steps</div>
+          <div class="tut-item on"  onclick="goStep(0,this)"><div class="tut-num">1</div>Install Omnigent</div>
+          <div class="tut-item"     onclick="goStep(1,this)"><div class="tut-num">2</div>Launch a Session</div>
+          <div class="tut-item"     onclick="goStep(2,this)"><div class="tut-num">3</div>Open in Browser</div>
+          <div class="tut-item"     onclick="goStep(3,this)"><div class="tut-num">4</div>Spawn Subagents</div>
+          <div class="tut-item"     onclick="goStep(4,this)"><div class="tut-num">5</div>Delegate &amp; Run</div>
+        </div>
+
+        <!-- tutorial content panes -->
+        <div class="tut-body">
+
+          <!-- STEP 1 -->
+          <div class="tut-step on" id="ts0">
+            <div class="step-hd">
+              <span class="step-badge">STEP 1</span>
+              <h3 class="step-title">Install Omnigent</h3>
+            </div>
+            <p class="step-desc">Omnigent is available on PyPI. Install it globally with pip. Python 3.9 or later is required.</p>
+            <div class="code-wrap">
+              <div class="code-head"><span class="code-lang">Bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code class="language-bash">pip install omnigent
+
+# Verify the install
+omnigent --version
+# omnigent v1.4.0</code></pre>
+            </div>
+            <p class="step-desc" style="margin-bottom:0;margin-top:14px;">Prefer isolated installs? Use <span class="ic">pipx install omnigent</span> to keep it sandboxed from project dependencies.</p>
+            <div class="step-note"><strong>Note:</strong> Behind a corporate proxy? Set <span class="ic">HTTPS_PROXY</span> before running pip. Conda users: <span class="ic">conda install -c conda-forge omnigent</span></div>
+            <div class="step-btns">
+              <button class="btn btn-primary" onclick="goStep(1, document.querySelectorAll('.tut-item')[1])">Next Step →</button>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="tut-step" id="ts1">
+            <div class="step-hd">
+              <span class="step-badge">STEP 2</span>
+              <h3 class="step-title">Launch a Session</h3>
+            </div>
+            <p class="step-desc">Start Omnigent with your preferred AI provider. On first run it prompts for an API key and stores it securely in your config.</p>
+            <div class="code-wrap">
+              <div class="code-head"><span class="code-lang">Bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code class="language-bash"># Start with Claude (recommended)
+omnigent claude
+
+# Or with OpenAI
+omnigent openai --model gpt-4o
+
+# Or a local model via Ollama
+omnigent openai --base-url http://localhost:11434/v1 --model llama3.1</code></pre>
+            </div>
+            <div class="step-note"><strong>Tip:</strong> Use <span class="ic">omnigent claude --session my-app</span> to name your session. Named sessions persist between restarts — rerun the same command to resume exactly where you left off.</div>
+            <div class="step-btns">
+              <button class="btn btn-back btn-back" onclick="goStep(0, document.querySelectorAll('.tut-item')[0])">← Back</button>
+              <button class="btn btn-primary" onclick="goStep(2, document.querySelectorAll('.tut-item')[2])">Next Step →</button>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="tut-step" id="ts2">
+            <div class="step-hd">
+              <span class="step-badge">STEP 3</span>
+              <h3 class="step-title">Open in Browser</h3>
+            </div>
+            <p class="step-desc">Omnigent serves a local web UI at <span class="ic">http://127.0.0.1:6767</span>. It opens automatically, but you can navigate there anytime to see your session tree and agent outputs.</p>
+            <div class="code-wrap">
+              <div class="code-head"><span class="code-lang">Bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code class="language-bash"># Open manually if the browser didn't auto-launch
+open http://127.0.0.1:6767
+
+# Or check the server status via curl
+curl http://127.0.0.1:6767/api/status
+# {"status":"running","session":"my-app","agents":1,"version":"1.4.0"}</code></pre>
+            </div>
+            <div class="callout" style="margin-top:14px;">
+              <div class="callout-ico">🌐</div>
+              <div>
+                <h4>Remote Server?</h4>
+                <p>Run <span class="ic">omnigent claude --host 0.0.0.0</span> on the server, then SSH tunnel: <span class="ic">ssh -L 6767:localhost:6767 user@your-server</span></p>
+              </div>
+            </div>
+            <div class="step-btns">
+              <button class="btn btn-back" onclick="goStep(1, document.querySelectorAll('.tut-item')[1])">← Back</button>
+              <button class="btn btn-primary" onclick="goStep(3, document.querySelectorAll('.tut-item')[3])">Next Step →</button>
+            </div>
+          </div>
+
+          <!-- STEP 4 -->
+          <div class="tut-step" id="ts3">
+            <div class="step-hd">
+              <span class="step-badge">STEP 4</span>
+              <h3 class="step-title">Spawn Your First Subagent Team</h3>
+            </div>
+            <p class="step-desc">From the UI or the Python SDK, spawn specialized agents for each domain. Each agent gets its own context window, system prompt, and tool access.</p>
+            <div class="code-wrap">
+              <div class="code-head"><span class="code-lang">Python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code class="language-python">from omnigent import Session
+
+session = Session.connect("my-app")
+
+frontend = session.spawn_agent(
+    name="frontend",
+    role="Senior React/TypeScript Engineer",
+    context_files=["src/components/", "src/hooks/", "src/store/"],
+    model="claude-sonnet-4-6",
+)
+
+backend = session.spawn_agent(
+    name="backend",
+    role="Backend Engineer, FastAPI + PostgreSQL expert",
+    context_files=["api/", "models/", "migrations/"],
+    model="claude-sonnet-4-6",
+)
+
+devops = session.spawn_agent(
+    name="devops",
+    role="DevOps Engineer, Docker + Railway specialist",
+    context_files=["Dockerfile", "docker-compose.yml", ".github/"],
+    model="claude-haiku-4-5",  # cheaper model for simpler tasks
+)
+
+print([a.name for a in session.agents])
+# ['orchestrator', 'frontend', 'backend', 'devops']</code></pre>
+            </div>
+            <div class="step-note"><strong>Tip:</strong> Pass <span class="ic">context_files</span> carefully — each agent only loads what it needs. Tight context = more token headroom = sharper outputs.</div>
+            <div class="step-btns">
+              <button class="btn btn-back" onclick="goStep(2, document.querySelectorAll('.tut-item')[2])">← Back</button>
+              <button class="btn btn-primary" onclick="goStep(4, document.querySelectorAll('.tut-item')[4])">Next Step →</button>
+            </div>
+          </div>
+
+          <!-- STEP 5 -->
+          <div class="tut-step" id="ts4">
+            <div class="step-hd">
+              <span class="step-badge">STEP 5</span>
+              <h3 class="step-title">Delegate Tasks &amp; Watch Them Run</h3>
+            </div>
+            <p class="step-desc">Delegate tasks to specialized agents or let the orchestrator auto-route. Everything runs in parallel — three agents shipping three features simultaneously.</p>
+            <div class="code-wrap">
+              <div class="code-head"><span class="code-lang">Python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+              <pre><code class="language-python">import asyncio
+from omnigent import Session
+
+session = Session.connect("my-app")
+
+async def main():
+    results = await asyncio.gather(
+        session.agent("frontend").task(
+            "Build UserProfileCard with avatar, name, role, and edit button. "
+            "Use design tokens from src/tokens.ts — no hardcoded values."
+        ),
+        session.agent("backend").task(
+            "Add PATCH /api/users/{id} endpoint. "
+            "Validate with Pydantic, persist to PostgreSQL, return updated user."
+        ),
+        session.agent("devops").task(
+            "Add GitHub Actions: run pytest on every PR, "
+            "deploy to Railway on merge to main."
+        ),
+    )
+
+    for r in results:
+        print(f"[{r.agent}] ✓ {r.summary}")
+        print(f"  Files: {r.files_modified}")
+        print(f"  Tokens: {r.tokens_used:,}\n")
+
+asyncio.run(main())
+
+# [frontend] ✓ UserProfileCard component created with full TypeScript types
+#   Files: ['src/components/UserProfileCard.tsx', '...test.tsx']
+#   Tokens: 8,432
+
+# [backend] ✓ PATCH endpoint with Pydantic validation and optimistic update
+#   Files: ['api/routes/users.py', 'api/schemas/user.py', 'tests/test_users.py']
+#   Tokens: 11,204
+
+# [devops] ✓ CI/CD pipeline configured for Railway auto-deploy
+#   Files: ['.github/workflows/ci.yml', '.github/workflows/deploy.yml']
+#   Tokens: 4,891</code></pre>
+            </div>
+            <div class="callout" style="background:rgba(76,175,80,.06);border-color:rgba(76,175,80,.2);margin-top:14px;">
+              <div class="callout-ico">🎉</div>
+              <div>
+                <h4 style="color:#4CAF50;">You're done. Welcome to the future of vibe coding.</h4>
+                <p>Three agents just shipped three features in the time it would've taken you to re-paste context into a single chat window. Token limits? Never heard of them.</p>
+              </div>
+            </div>
+            <div class="step-btns">
+              <button class="btn btn-back" onclick="goStep(3, document.querySelectorAll('.tut-item')[3])">← Back</button>
+              <a href="#features" class="btn btn-primary">Explore All Features →</a>
+            </div>
+          </div>
+
+        </div><!-- /tut-body -->
+      </div><!-- /tut-shell -->
+    </section>
+
+    <!-- ── TESTIMONIALS ── -->
+    <section class="section" id="testimonials">
+      <div class="s-eyebrow">Community</div>
+      <h2 class="s-title">Vibe coders are shipping faster than ever</h2>
+      <p class="s-desc">From solo hackers to startup CTOs — here's what happens when you stop fighting token limits and start building.</p>
+      <div class="testi-grid">
+        <div class="testi-card">
+          <div class="stars">★★★★★</div>
+          <p class="testi-q">I used to lose 45 minutes every single day re-explaining my project to the AI after a context reset. With Omnigent, that's completely gone. I spawn a fresh backend agent, the orchestrator briefs it automatically, and I'm back in flow within seconds. It's genuinely changed how I build things.</p>
+          <div class="testi-author">
+            <div class="avatar" style="background:linear-gradient(135deg,#667eea,#764ba2)">AK</div>
+            <div>
+              <div class="author-name">Arjun K.</div>
+              <div class="author-role">Full-Stack Dev · Solo Founder, Buildfast.app</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="stars">★★★★★</div>
+          <p class="testi-q">The parallel execution is insane. My frontend agent built React components while my backend agent simultaneously wrote the API routes. Both finished in the time one would've taken. We shipped our entire MVP in a weekend. Omnigent is basically free senior engineers.</p>
+          <div class="testi-author">
+            <div class="avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c)">SL</div>
+            <div>
+              <div class="author-name">Sarah L.</div>
+              <div class="author-role">CTO · YC S24 Startup</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="stars">★★★★★</div>
+          <p class="testi-q">I'm a designer who codes. My biggest fear was the AI losing context halfway through and breaking the design system we'd built together. Omnigent's persistent sessions mean my frontend agent remembers every token, every color, every spacing rule — across multiple sessions. This is the tool.</p>
+          <div class="testi-author">
+            <div class="avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">MR</div>
+            <div>
+              <div class="author-name">Marcus R.</div>
+              <div class="author-role">Design Engineer · Freelance</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA BANNER ── -->
+    <section class="section section-dark" id="cta" style="border-bottom:none;">
+      <div class="hero-badge" style="justify-content:center;margin:0 auto 24px;display:inline-flex;left:50%;position:relative;transform:translateX(-50%);">
+        <span class="pulse"></span> Free to start · No credit card required
+      </div>
+      <h2 class="s-title inv" style="text-align:center;max-width:520px;margin:0 auto 14px;font-size:clamp(26px,3.5vw,44px);">Ready to stop fighting token limits?</h2>
+      <p class="s-desc inv" style="text-align:center;margin:0 auto 34px;">Install Omnigent in 30 seconds and ship your next feature without a single context reset.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <a href="#tutorial" class="btn btn-primary btn-lg">pip install omnigent →</a>
+        <a href="#what-is"  class="btn btn-ghost  btn-lg">Read the Docs</a>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer>
+      <div class="ft-grid">
+        <div class="ft-brand">
+          <div class="ft-logo">
+            <div class="logo-icon">Ω</div>
+            <span style="font-size:17px;font-weight:700;color:#fff;">Omnigent</span>
+          </div>
+          <p class="ft-desc">The multi-agent orchestration platform for vibe coders who refuse to let token limits kill their flow. Build faster. Think bigger. Ship smarter.</p>
+          <div class="ft-social">
+            <a href="#" class="soc-btn" aria-label="GitHub">
+              <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            </a>
+            <a href="#" class="soc-btn" aria-label="Twitter">
+              <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="#" class="soc-btn" aria-label="Discord">
+              <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+            </a>
+          </div>
+        </div>
+        <div>
+          <div class="ft-col-h">Product</div>
+          <ul class="ft-links">
+            <li><a href="#features"  class="ft-link">Features</a></li>
+            <li><a href="#tutorial"  class="ft-link">Documentation</a></li>
+            <li><a href="#"          class="ft-link">Changelog</a></li>
+            <li><a href="#"          class="ft-link">Roadmap</a></li>
+            <li><a href="#"          class="ft-link">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="ft-col-h">Integrations</div>
+          <ul class="ft-links">
+            <li><a href="#" class="ft-link">Claude (Anthropic)</a></li>
+            <li><a href="#" class="ft-link">OpenAI / Codex</a></li>
+            <li><a href="#" class="ft-link">Cursor</a></li>
+            <li><a href="#" class="ft-link">GitHub Copilot</a></li>
+            <li><a href="#" class="ft-link">Ollama (Local)</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="ft-col-h">Community</div>
+          <ul class="ft-links">
+            <li><a href="#" class="ft-link">GitHub</a></li>
+            <li><a href="#" class="ft-link">Discord Server</a></li>
+            <li><a href="#" class="ft-link">Twitter / X</a></li>
+            <li><a href="#" class="ft-link">Blog</a></li>
+            <li><a href="#" class="ft-link">Contributing Guide</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ft-bottom">
+        <div class="ft-copy">© 2025 Omnigent. All rights reserved. Built for the vibe coders.</div>
+        <div class="ft-legal">
+          <a href="#" class="ft-link">Privacy Policy</a>
+          <a href="#" class="ft-link">Terms of Service</a>
+          <a href="#" class="ft-link">Status</a>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+</div><!-- /wrap -->
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+
+  function sbActive(el) {
+    document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('on'));
+    el.classList.add('on');
+    if (window.innerWidth <= 780) toggleSidebar();
+  }
+
+  function goStep(idx, navEl) {
+    const items = document.querySelectorAll('.tut-item');
+    items.forEach((item, i) => {
+      item.classList.remove('on', 'done');
+      if (i < idx) item.classList.add('done');
+    });
+    navEl.classList.add('on');
+
+    document.querySelectorAll('.tut-step').forEach(s => s.classList.remove('on'));
+    document.getElementById('ts' + idx).classList.add('on');
+  }
+
+  function copyCode(btn) {
+    const code = btn.closest('.code-wrap').querySelector('code');
+    navigator.clipboard.writeText(code.innerText).then(() => {
+      btn.textContent = 'Copied!';
+      btn.style.color = '#4CAF50';
+      setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
+    });
+  }
+
+  /* Highlight active sidebar link on scroll */
+  const sections = document.querySelectorAll('section[id]');
+  const sbLinks  = document.querySelectorAll('.sb-link[href^="#"]');
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        sbLinks.forEach(l => {
+          l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id);
+        });
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '-62px 0px -40% 0px' }).observe
+    ? sections.forEach(s => new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting)
+            sbLinks.forEach(l => l.classList.toggle('on', l.getAttribute('href') === '#' + e.target.id));
+        });
+      }, { threshold: 0.25, rootMargin: '-62px 0px -40% 0px' }).observe(s))
+    : null;
+</script>
+</body>
+</html>
