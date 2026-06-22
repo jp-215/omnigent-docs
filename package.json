@@ -1,9 +1,18 @@
 {
-  "name": "omnigent-docs",
+  "name": "omnigent-docs-root",
   "version": "1.0.0",
-  "description": "Omnigent documentation site",
+  "description": "Omnigent docs — monorepo root",
+  "private": true,
   "scripts": {
-    "start": "npx serve . -p 3000",
-    "start:py": "python3 serve.py"
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev": "npx concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "build:frontend": "npm run build --prefix frontend",
+    "build:backend": "npm run build --prefix backend",
+    "build": "npm run build:frontend && npm run build:backend",
+    "install:all": "npm install --prefix frontend && npm install --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   }
 }

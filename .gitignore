@@ -5,3 +5,7 @@ desktop.ini
 .env
 .env.local
 Thumbs.db
+dist/
+*.tsbuildinfo
+vite.config.d.ts
+vite.config.js
